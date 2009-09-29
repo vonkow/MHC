@@ -1,0 +1,161 @@
+<html>
+	<head>
+		<script type="text/javascript">
+			//My Utilities
+			var cvk = {};
+			//Kill Children of Element
+			cvk.killChildren = function(ele) {
+				ele = document.getElementById(ele);
+				var total = ele.childNodes.length;
+				for (var x=0; x<total; x++) {
+					ele.removeChild(ele.childNodes[0]);
+				}
+			}
+			//Kill Element
+			cvk.kill = function(ele) {
+				if (document.getElementById(ele)) {
+					var ded = document.getElementById(ele);
+					ded.parentNode.removeChild(ded);
+				}
+			}
+			//Generic AJAX getXmlHttpRequest BS
+			cvk.getXHR = function() {
+				if (window.XMLHttpRequest) {
+					//Real Browsers
+					return new XMLHttpRequest();
+				}
+				else if (window.ActiveXObject) {
+					//IE fucking 6 (and 5!)
+					return new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				else {
+					alert("Luddite!!!");
+					return null;
+				}
+			}
+			
+			// Scoring Object
+			var score = {};
+			score.correct = 0;
+			score.total = 0;
+			score.iterations = 0;
+			score.set = {{ set.id }};
+			score.currentCard = 0;
+			//score.onQ = true; //true for on question, false for on answer
+			score.done = false;
+			
+			// Card Object Factory
+			function card(q, a) {
+				this.q = q;
+				this.a = a;
+			}
+			
+			//Card array, server will create cards
+			var cards = [];
+			{% for card in set.card_set.all %}
+				cards[{{ forloop.counter0 }}] = new card('{{ card.question }}', '{{ card.answer }}');
+			{% endfor %}
+			//cards[0] = new card('I say moo', 'A Cow');
+			//cards[1] = new card('I say meow', 'A Cat');
+			
+			
+			//Sets currentCard to 0 if it has reached cards.length
+			function loopCards() {
+				if (score.currentCard==cards.length) {
+					score.iterations++;
+					score.currentCard = 0;
+				}
+			}
+			
+			//Shows question side of card
+			function showQ() {
+				cvk.killChildren('qcard');
+				var qcard = document.getElementById('qcard');
+				qcard.innerHTML = cards[score.currentCard].q; //I will burn in developer hell for this...
+				document.getElementById('acard').style.display = 'none';
+				document.getElementById('abut').style.display = 'none';
+				qcard.style.display = 'block';
+				document.getElementById('qbut').style.display = 'block';
+			}
+			
+			// Shows answer side of card
+			function showA() {
+				cvk.killChildren('acard');
+				var acard = document.getElementById('acard');
+				acard.innerHTML = cards[score.currentCard].a; //I will burn in developer hell for this...
+				document.getElementById('qcard').style.display = 'none';
+				document.getElementById('qbut').style.display = 'none';
+				acard.style.display = 'block';
+				document.getElementById('abut').style.display = 'block';
+			}
+			
+			// Show next card and log completion of card and correct or not
+			function nextCard(correct) {
+				score.total++
+				if (correct==true) {
+					score.correct++;
+				}
+				score.currentCard++;
+				loopCards();
+				showQ();
+			}
+			
+			//Starts test and hides 'Start Test' Button
+			function runTest() {
+				document.getElementById('sbut').style.display = 'none';
+				document.getElementById('scard').style.display = 'none';
+				window.setTimeout('endTest()', 10000) //Change to 60000 for 1 min
+				showQ();
+			}
+			
+			// Ends Test, duh!
+			function endTest() {
+				score.done = true;
+				alert('Done! '+score.correct+' of '+score.total+' correct.');
+				sendResults();
+			}
+			
+			function sendResults() {
+				document.results.total.value = score.total;
+				document.results.correct.value = score.correct;
+				document.results.iterations.value = score.iterations;
+				document.results.submit();
+			}
+			
+		</script>
+	</head>
+	<body>
+		<div id="thecard">
+			<div id="scard">
+				This is the Card!
+			</div>
+			<div id="qcard" style="display:none;">
+				
+			</div>
+			<div id="acard" style="display:none;">
+				
+			</div>
+		</div>
+		<div id="buttonarea">
+			<div id="sbut">
+				<input type="button" value="Start!" onclick="runTest();" id="startbut">
+			</div>
+			<div id="qbut" style="display:none;">
+				<br>
+				<input type="button" value="Show Answer" onclick="showA();">
+			</div>
+			<div id="abut" style="display:none;">
+				Were you correct?<br>
+				<input type="button" value="Yes" onclick="nextCard(true);">
+				&nbsp;&nbsp;
+				<input type="button" value="No" onclick="nextCard(false);">
+			</div>
+		</div>
+		<form name="results" action="/send_results/" method="post">
+			<input type="hidden" name="total" value="0">
+			<input type="hidden" name="correct" value="0">
+			<input type="hidden" name="iterations" value="0">
+			<input type="hidden" name="set" value="{{ set.id }}">
+		</form>
+	</body>
+</html>

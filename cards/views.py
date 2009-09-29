@@ -1,0 +1,117 @@
+from django.core import serializers
+from django.shortcuts import render_to_response, get_object_or_404
+from django.http import HttpResponseRedirect, HttpResponse
+from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import ModelForm
+from django.core.mail import send_mail
+from django.db import IntegrityError
+from django.contrib import auth
+from datetime import datetime
+from mhc.cards.models import cardSet, card, userProfile, userSet, userSetScore
+
+# Create your views here.
+
+# (HELPER FUNCTION)
+# Gets or Creates a Profile linked to specified user
+def get_or_create_profile(user):
+	try:
+		profile = user.get_profile()
+	except ObjectDoesNotExist:
+		#Create Profile
+		profile = userProfile(user=user, info=' ', currentSet=cardSet.objects.get(pk=1))
+		profile.save()
+	return profile
+
+def get_or_create_userset(user, cardset):
+	try:
+		userset = userSet.objects.get(user=user)
+	except ObjectDoesNotExist:
+		userset = userSet(user=user, cardSet=cardset)
+		userset.save()
+	return userset
+
+#(AJAX REQUEST) Good for now
+def newUser(request):
+	#Check for existing username and email (could be written better)
+	user_list = auth.models.User.objects.filter(username=request.POST['username'])
+	email_list = auth.models.User.objects.filter(email=request.POST['email'])
+	response = HttpResponse()
+	noU=True
+	noE=True
+	for user in user_list:
+		noU=False
+	for email in email_list:
+		noE=False
+	#If username isn't taken
+	if noU:
+		#If email isn't taken
+		if noE:
+			#Create user
+			user = auth.models.User.objects.create_user(username = request.POST['username'], 
+														password = request.POST['password'], 
+														email = request.POST['email'])
+			user.save()
+			#Create Profile
+			user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
+			user.userprofile = get_or_create_profile(user)
+			if user is not None and user.is_active:
+				auth.login(request, user)
+			response.write('1')
+		else:
+			response.write('-1')
+	else:
+		response.write('0')
+	return response
+
+#Good for now
+def login(request):
+	#response = HttpResponse()
+	username = request.POST['username']
+	password = request.POST['password']
+	user = auth.authenticate(username=username, password=password)
+	if user is not None and user.is_active:
+		auth.login(request, user)
+		#response.write(user.id)
+		return HttpResponseRedirect('/main')
+	else:
+		#response.write('0')
+		return HttpResponseRedirect('/')
+	#return response
+
+#(AJAX REQUEST) Good for now
+def logout(request):
+	if request.user.is_authenticated():
+		auth.logout(request)
+	return HttpResponseRedirect('/')
+
+def showLogin(request):
+	if request.user.is_authenticated():
+		return HttpResponseRedirect('/main')
+	else:
+		return render_to_response('login.html',)
+
+def showSet(request):
+	if request.user.is_authenticated():
+		profile = get_or_create_profile(request.user)
+		Set = profile.currentSet
+		return render_to_response('card.html', {'set': Set})
+	else:
+		#Return user to login/register page
+		return HttpResponseRedirect('/')
+
+def processSet(request):
+	if request.user.is_authenticated():
+		profile = get_or_create_profile(request.user)
+		current_set = cardSet.objects.get(pk=request.POST['set'])
+		userset = get_or_create_userset(request.user, current_set)
+		usersetscore = userSetScore(userSet=userset, total=request.POST['total'], correct=request.POST['correct'], iterations=request.POST['iterations'])
+		usersetscore.save()
+		response = HttpResponse()
+		response.write(usersetscore.percent())
+		return response
+		#Add iterator to current set based upon scoring results, lot's of code will be here 
+		#return HttpResponseRedirect('/main')
+	else:
+		#Return user to login/register page
+		return HttpResponseRedirect('/')
