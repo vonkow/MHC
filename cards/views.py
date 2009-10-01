@@ -105,13 +105,39 @@ def processSet(request):
 		profile = get_or_create_profile(request.user)
 		current_set = cardSet.objects.get(pk=request.POST['set'])
 		userset = get_or_create_userset(request.user, current_set)
-		usersetscore = userSetScore(userSet=userset, total=request.POST['total'], correct=request.POST['correct'], iterations=request.POST['iterations'])
+		userset.attempts = userset.attempts+1
+		userset.save()
+		usersetscore = userSetScore(userSet=userset, total=request.POST['total'], correct=request.POST['correct'], iterations=request.POST['iterations'], attempt=userset.attempts)
 		usersetscore.save()
 		response = HttpResponse()
-		response.write(usersetscore.percent())
+		response.write(results(request))
 		return response
 		#Add iterator to current set based upon scoring results, lot's of code will be here 
 		#return HttpResponseRedirect('/main')
 	else:
 		#Return user to login/register page
 		return HttpResponseRedirect('/')
+
+def results(request):
+	if request.user.is_authenticated():
+		profile = get_or_create_profile(request.user)
+		userset = get_or_create_userset(request.user, profile.currentSet)
+		usersetscores = userset.usersetscore_set.all().order_by('-attempt')
+		if userset.attempts>1:
+			percent = usersetscores[0].percent()
+			total = usersetscores[0].total
+			if percent >= usersetscores[1].percent() and total >= usersetscores[1].total:
+				#profile.currentSet = profile.currentSet+1
+				#profile.save()
+				return 1 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+			elif percent < usersetscores[1].percent() and total < usersetscores[1].total:
+				return -1 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+			else:
+				return 0 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+		else:
+			return 2
+		
+		#return HttpResponseRedirect('/')
+	else:
+		return 3
+		#return HttpResponseRedirect('/')

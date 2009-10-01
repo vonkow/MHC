@@ -29,6 +29,7 @@ class userProfile(models.Model):
 class userSet(models.Model):
 	user = models.ForeignKey(User)
 	cardSet = models.ForeignKey(cardSet)
+	attempts = models.IntegerField(default=0)
 
 class userSetScore(models.Model):
 	userSet = models.ForeignKey(userSet)
