@@ -7,6 +7,7 @@ from django.forms import ModelForm
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.contrib import auth
+from django.template import RequestContext
 from datetime import datetime
 from mhc.cards.models import cardSet, card, userProfile, userSet, userSetScore
 
@@ -95,7 +96,7 @@ def showSet(request):
 	if request.user.is_authenticated():
 		profile = get_or_create_profile(request.user)
 		Set = profile.currentSet
-		return render_to_response('card.html', {'set': Set})
+		return render_to_response('card.html', {'set': Set}, context_instance=RequestContext(request))
 	else:
 		#Return user to login/register page
 		return HttpResponseRedirect('/')
@@ -110,15 +111,14 @@ def processSet(request):
 		usersetscore = userSetScore(userSet=userset, total=request.POST['total'], correct=request.POST['correct'], iterations=request.POST['iterations'], attempt=userset.attempts)
 		usersetscore.save()
 		response = HttpResponse()
-		response.write(results(request))
+		response.write(calcResults(request))
 		return response
-		#Add iterator to current set based upon scoring results, lot's of code will be here 
 		#return HttpResponseRedirect('/main')
 	else:
 		#Return user to login/register page
 		return HttpResponseRedirect('/')
 
-def results(request):
+def calcResults(request):
 	if request.user.is_authenticated():
 		profile = get_or_create_profile(request.user)
 		userset = get_or_create_userset(request.user, profile.currentSet)
@@ -126,14 +126,19 @@ def results(request):
 		if userset.attempts>1:
 			percent = usersetscores[0].percent()
 			total = usersetscores[0].total
-			if percent >= usersetscores[1].percent() and total >= usersetscores[1].total:
+			iterations = usersetscores[0].iterations
+			# Faster and More Accurate plus at least one full cycle
+			if percent >= usersetscores[1].percent() and total >= usersetscores[1].total and iterations > 0:
 				#profile.currentSet = profile.currentSet+1
 				#profile.save()
 				return 1 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+			# Slower and less accurate
 			elif percent < usersetscores[1].percent() and total < usersetscores[1].total:
 				return -1 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+			# Neither of the Above
 			else:
 				return 0 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+		# First Attempt, maybe return 0 as well
 		else:
 			return 2
 		

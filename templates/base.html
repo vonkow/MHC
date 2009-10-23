@@ -1,0 +1,44 @@
+<html>
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		<style type="text/css">
+			body {
+				background-color: #ababab;
+				color: #000000;
+				font-family: "Times New Roman";
+				font-size: 14pt;
+			}
+			#container {
+				width: 800px;
+				margin: 0 auto;
+				text-align: center;
+				border: solid 1px black;
+				background-color: #ffffff;
+				padding: 10px;
+			}
+			#inner {
+				text-align: left;
+			}
+			a {
+				text-decoration: none;
+				color: #0000ff;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+		</style>
+		{% block headstuff %}
+		{% endblock %}
+	</head>
+	<body>
+		<div id="container">
+		<img src="/static/welcome.gif"><br>
+{% if user.is_authenticated %}
+    <div style="text-align:right;">Hi, {{ user.username }}. <a href="/logout">Log Out</a></div>
+{% endif %}
+
+			{% block main %}
+			{% endblock %}
+		</div>
+	</body>
+</html>

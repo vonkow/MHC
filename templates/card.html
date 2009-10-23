@@ -1,5 +1,6 @@
-<html>
-	<head>
+{% extends "base.html" %}
+	{% block title %}{{ set.name }} Test | Precision Teaching Center{% endblock %}
+	{% block headstuff %}
 		<script type="text/javascript">
 			//My Utilities
 			var cvk = {};
@@ -53,7 +54,7 @@
 			//Card array, server will create cards
 			var cards = [];
 			{% for card in set.card_set.all %}
-				cards[{{ forloop.counter0 }}] = new card('{{ card.question }}', '{{ card.answer }}');
+				cards[{{ forloop.counter0 }}] = new card('{{ card.question|safe }}', '{{ card.answer|safe }}');
 			{% endfor %}
 			//cards[0] = new card('I say moo', 'A Cow');
 			//cards[1] = new card('I say meow', 'A Cat');
@@ -123,11 +124,11 @@
 			}
 			
 		</script>
-	</head>
-	<body>
+	{% endblock %}
+	{% block main %}
 		<div id="thecard">
 			<div id="scard">
-				This is the Card!
+				{{ set.content|safe }}
 			</div>
 			<div id="qcard" style="display:none;">
 				
@@ -157,5 +158,4 @@
 			<input type="hidden" name="iterations" value="0">
 			<input type="hidden" name="set" value="{{ set.id }}">
 		</form>
-	</body>
-</html>
+	{% endblock %}
