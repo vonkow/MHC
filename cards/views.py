@@ -110,10 +110,12 @@ def processSet(request):
 		userset.save()
 		usersetscore = userSetScore(userSet=userset, total=request.POST['total'], correct=request.POST['correct'], iterations=request.POST['iterations'], attempt=userset.attempts)
 		usersetscore.save()
-		response = HttpResponse()
-		response.write(calcResults(request))
-		return response
+		#response = HttpResponse()
+		#response.write(calcResults(request))
+		#return response
 		#return HttpResponseRedirect('/main')
+		usersetscores = userset.usersetscore_set.all().order_by('-attempt')
+		return render_to_response('graph.html', {'scores': usersetscores})
 	else:
 		#Return user to login/register page
 		return HttpResponseRedirect('/')

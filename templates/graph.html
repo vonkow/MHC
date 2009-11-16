@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Results | Precision Teaching Center{% endblock %}
+{% block main %}
+<br><br>
+<div style="width:600px;margin:0 auto;text-align:center;"> 
+	<div id="grapharea" style="height:400px;width:600px;">
+		
+	</div>
+	<div id="graphinfo" style="height:100px;width:600px">
+
+	</div>
+	<script type="text/javascript">
+		var results = [];
+		{% for score in scores %}
+			results[{{ forloop.counter0 }}] = {questions:{{ score.total }}, correct:{{ score.correct }}, iterations:{{ score.iterations }}, percent:Math.floor(({{ score.correct }}/{{ score.total }})*100)};
+		{% endfor %}
+		var most_questions = 0;
+		// Loop to find most questions
+		for (var x=0; x<results.length;x++) {
+			if (results[x].questions>most_questions) {
+				most_questions = results[x].questions;
+			}
+		}
+		var bar_width = Math.floor(600/results.length);
+		// Loop to create graph
+		for (var x=0; x<results.length;x++) {
+			// Create Holder for bars
+			var barholder = document.createElement('div');
+			barholder.style.height = '100%';
+			barholder.style.width = bar_width+'px';
+			barholder.style.cssFloat = 'left';
+			// Left padding for bars
+			var barpadL = document.createElement('div');
+			barpadL.style.width = '8%';
+			barpadL.style.height = '100%';
+			barpadL.style.cssFloat = 'left';
+			// Percent Bar
+			var barpercent = document.createElement('div');
+			barpercent.style.height = '100%';
+			var barblank = document.createElement('div');
+			barblank.style.height = (100-results[x].percent)+'%';
+			var bar = document.createElement('div');
+			bar.style.height = results[x].percent+'%';
+			bar.style.backgroundColor = '#000000';
+			bar.style.textAlign = 'center';
+			bar.appendChild(document.createElement('br'));
+			bar.appendChild(document.createTextNode(results[x].correct+' / '+results[x].questions));
+			bar.appendChild(document.createElement('br'));
+			bar.appendChild(document.createTextNode(results[x].percent+'%'));
+			// Total questions bar
+			var bartotal = document.createElement('div');
+			bartotal.style.width = '90%';
+			bartotal.style.height = '100%';
+			bartotal.style.cssFloat = 'left';
+			var barTblank = document.createElement('div');
+			barTblank.style.height = (100-((Math.floor((results[x].questions/most_questions)*100))))+'%';
+			var barT = document.createElement('div');
+			barT.style.height = Math.floor((results[x].questions/most_questions)*100)+'%';
+			barT.style.backgroundColor = '#888888';
+			barT.style.color = '#ffffff';
+			barT.style.textAlign = 'center';
+			var barpadR = document.createElement('div');
+			barpadR.style.width = '8%';
+			barpadR.style.height = '100%';
+			barpadR.style.cssFloat = 'left';
+
+			barpercent.appendChild(barblank);
+			barpercent.appendChild(bar);
+			barT.appendChild(barpercent);
+			bartotal.appendChild(barTblank);
+			bartotal.appendChild(barT);
+			barholder.appendChild(barpadL);
+			barholder.appendChild(bartotal);
+			barholder.appendChild(barpadR);
+			document.getElementById('grapharea').appendChild(barholder);
+			var barnum = document.createElement('div');
+			barnum.style.height = '100%';
+			barnum.style.width = bar_width+'px';
+			barnum.style.cssFloat = 'left';
+			barnum.style.textAlign = 'center';
+			barnum.style.fontWeight = 'bold';
+			barnum.appendChild(document.createElement('br'));
+			barnum.appendChild(document.createTextNode(x+1));
+			document.getElementById('graphinfo').appendChild(barnum);
+		}
+	</script>
+</div>
+{% endblock %}
