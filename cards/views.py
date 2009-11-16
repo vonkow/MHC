@@ -114,7 +114,7 @@ def processSet(request):
 		#response.write(calcResults(request))
 		#return response
 		#return HttpResponseRedirect('/main')
-		usersetscores = userset.usersetscore_set.all().order_by('-attempt')
+		usersetscores = userset.usersetscore_set.all().order_by('attempt')
 		return render_to_response('graph.html', {'scores': usersetscores})
 	else:
 		#Return user to login/register page
