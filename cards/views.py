@@ -110,6 +110,7 @@ def processSet(request):
 		userset.save()
 		usersetscore = userSetScore(userSet=userset, total=request.POST['total'], correct=request.POST['correct'], iterations=request.POST['iterations'], attempt=userset.attempts)
 		usersetscore.save()
+		calcResults(request)
 		#response = HttpResponse()
 		#response.write(calcResults(request))
 		#return response
@@ -125,26 +126,26 @@ def calcResults(request):
 		profile = get_or_create_profile(request.user)
 		userset = get_or_create_userset(request.user, profile.currentSet)
 		usersetscores = userset.usersetscore_set.all().order_by('-attempt')
-		if userset.attempts>1:
+		# minimum of 3 attempts
+		if userset.attempts>3:
 			percent = usersetscores[0].percent()
 			total = usersetscores[0].total
 			iterations = usersetscores[0].iterations
 			# Faster and More Accurate plus at least one full cycle
 			if percent >= usersetscores[1].percent() and total >= usersetscores[1].total and iterations > 0:
-				#profile.currentSet = profile.currentSet+1
-				#profile.save()
-				return 1 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+				setId = profile.currentSet.id+1
+				newSet = get_object_or_404(cardSet, pk=setId)
+				profile.currentSet = newSet
+				profile.save()
+				return 1
 			# Slower and less accurate
 			elif percent < usersetscores[1].percent() and total < usersetscores[1].total:
-				return -1 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+				return -1
 			# Neither of the Above
 			else:
-				return 0 #+str(usersetscores[0].percent())+' '+str(usersetscores[1].percent())
+				return 0
 		# First Attempt, maybe return 0 as well
 		else:
 			return 2
-		
-		#return HttpResponseRedirect('/')
 	else:
 		return 3
-		#return HttpResponseRedirect('/')
