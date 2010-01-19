@@ -3,6 +3,7 @@ from django.contrib import admin
 
 urlpatterns = patterns('mhc.cards.views',
 	(r'^$', 'showLogin'),
+	(r'^register/$', 'newUser'),
 	(r'^login/$', 'login'),
 	(r'^logout/$', 'logout'),
 	(r'^main/$', 'showSet'),

@@ -12,7 +12,7 @@ class cardSet(models.Model):
 	content = models.TextField()
 	def __unicode__(self):
 		return self.name
-
+		
 class card(models.Model):
 	name = models.CharField(max_length=100)
 	cardSet = models.ForeignKey(cardSet)

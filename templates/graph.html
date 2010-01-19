@@ -11,27 +11,36 @@
 			right[{{ forloop.counter0 }}] = [{{ forloop.counter0 }}, {{ score.correct }}];
 			wrong[{{ forloop.counter0 }}] = [{{ forloop.counter0 }}, ({{ score.total }}-{{ score.correct }})];
 		{% endfor %}
-		 $(function () {
-			 $.plot($("#placeholder"),
-			 [ { data: right, label: "Right" },
-			   { data: wrong, label: "Wrong" }],
-			 { 
-			   xaxis: { min: 0,
-			//	transform: function (v) { return Math.log(v); },
-			//	inverseTransform: function (v) { return Math.exp(v); },
-			   },
-			   yaxis: {     
-				min: 0 
-				},
-			   legend: { position: 'sw' } });
-				});
+		if (right.length>1) {
+			 $(function () {
+				 $.plot($("#placeholder"),
+				 [ { data: right, label: "Right" },
+				   { data: wrong, label: "Wrong" }],
+				 { 
+				   xaxis: { min: 0,
+				//	transform: function (v) { return Math.log(v); },
+				//	inverseTransform: function (v) { return Math.exp(v); },
+				   },
+				   yaxis: {     
+					min: 0 
+					},
+				   legend: { position: 'sw' } });
+					});
+		} else {
+			var firstTry = true;
+		}
 	</script>
 	<div style="margin: 0 auto; text-align:center;">
-		<div id="placeholder" style="width:600px;height:300px;"></div>
+		<div id="placeholder" style="width:600px;height:300px;margin: 0 auto;text-align:center;"></div>
 	</div>
 	<div style="text-align:center;">
 		<a href="../" style="text-decoration:none;">
 			<input type="button" value="Continue" />
 		</a>
 	</div>
+	<script type="text/javascript">
+		if (firstTry==true) {
+			document.getElementById('placeholder').innerHTML='Now the test will be repeated. <br>As you increase your response rate and accuracy you will be given more complex tests.<br>';
+		}
+	</script>
 {% endblock %}
