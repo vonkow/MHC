@@ -32,6 +32,9 @@ def get_or_create_userset(user, cardset):
 		userset.save()
 	return userset
 
+def get_set_list():
+	return cardSet.objects.all()
+
 def newUser(request):
 	#Check for existing username and email (could be written better)
 	user_list = auth.models.User.objects.filter(username=request.POST['username'])
@@ -83,17 +86,33 @@ def showLogin(request):
 	else:
 		return render_to_response('login.html',)
 
-def showSet(request):
+def selectSet(request, setNum):
 	if request.user.is_authenticated():
 		profile = get_or_create_profile(request.user)
+		Set = get_object_or_404(cardSet, pk=setNum)
+		profile.currentSet = Set
+		profile.save()
+		return HttpResponseRedirect('/main')
+	else:
+		return render_to_response('login.html',)
+
+def showSet(request):
+	if request.user.is_authenticated():
+		set_list = get_set_list()
+		profile = get_or_create_profile(request.user)
 		Set = profile.currentSet
-		return render_to_response('card.html', {'set': Set}, context_instance=RequestContext(request))
+		random_order = 0
+		userset = get_or_create_userset(request.user, Set)
+		if userset.attempts > 0:
+			random_order = 1
+		return render_to_response('card.html', {'set': Set, 'random_order':random_order, 'set_list': set_list}, context_instance=RequestContext(request))
 	else:
 		#Return user to login/register page
 		return HttpResponseRedirect('/')
 
 def processSet(request):
 	if request.user.is_authenticated():
+		set_list = get_set_list()
 		profile = get_or_create_profile(request.user)
 		current_set = profile.currentSet #cardSet.objects.get(pk=request.POST['set'])
 		userset = get_or_create_userset(request.user, current_set)
@@ -103,7 +122,7 @@ def processSet(request):
 		usersetscore.save()
 		calcResults(request)
 		usersetscores = userset.usersetscore_set.all().order_by('attempt')
-		return render_to_response('graph.html', {'scores': usersetscores})
+		return render_to_response('graph.html', {'scores': usersetscores, 'set_list': set_list})
 	else:
 		#Return user to login/register page
 		return HttpResponseRedirect('/')

@@ -19,6 +19,19 @@
 			#inner {
 				text-align: left;
 			}
+			#sidebar {
+			}
+			#sidebar ul {
+				padding:0;
+				margin:0;
+			}
+			#sidebar li {
+				list-style: none;
+				display: inline;
+			}
+			#sidebar li a {
+				padding : 0.25em 0.5em 0.25em 0.75em;
+			}
 			a {
 				text-decoration: none;
 				color: #0000ff;
@@ -32,13 +45,22 @@
 	</head>
 	<body>
 		<div id="container">
-		<img src="/static/welcome.gif"><br>
-{% if user.is_authenticated %}
-    <div style="text-align:right;">Hi, {{ user.username }}. <a href="/logout">Log Out</a></div>
-{% endif %}
-
+			<img src="/static/welcome.gif"><br>
+			{% if user.is_authenticated %}
+				<div style="text-align:right;">Hi, {{ user.username }}. <a href="/logout">Log Out</a></div>
+			{% endif %}
 			{% block main %}
 			{% endblock %}
+			{% if set_list %}
+				<div id="sidebar">
+					<h4 style="margin:0;">Select Another Test</h4>
+					<ul>
+						{% for set in set_list %}
+							<li><a href="/select_set/{{ set.id }}/">{{ set.name }}</a></li>
+						{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
 		</div>
 	</body>
 </html>

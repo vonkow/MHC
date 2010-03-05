@@ -8,5 +8,5 @@ urlpatterns = patterns('mhc.cards.views',
 	(r'^logout/$', 'logout'),
 	(r'^main/$', 'showSet'),
 	(r'^send_results/$', 'processSet'),
-
+	(r'^select_set/(?P<setNum>\d+)/$', 'selectSet'),
 )

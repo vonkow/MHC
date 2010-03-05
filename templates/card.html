@@ -56,15 +56,20 @@
 			{% for card in set.card_set.all %}
 				cards[{{ forloop.counter0 }}] = new card('{{ card.question|safe }}', '{{ card.answer|safe }}');
 			{% endfor %}
-			//cards[0] = new card('I say moo', 'A Cow');
-			//cards[1] = new card('I say meow', 'A Cat');
-			
-			
+			function randOrd(){
+				return (Math.round(Math.random())-0.5); 
+			} 
+			if ({{ random_order }}==1) {
+				cards = cards.sort(randOrd);
+			}
 			//Sets currentCard to 0 if it has reached cards.length
 			function loopCards() {
 				if (score.currentCard==cards.length) {
 					score.iterations++;
 					score.currentCard = 0;
+					if ({{ random_order }}==1) {
+						cards = cards.sort(randOrd);
+					}
 				}
 			}
 			
@@ -72,7 +77,7 @@
 			function showQ() {
 				cvk.killChildren('qcard');
 				var qcard = document.getElementById('qcard');
-				qcard.innerHTML = cards[score.currentCard].q; //I will burn in developer hell for this...
+				qcard.innerHTML = "<h4>Question</h4>"+cards[score.currentCard].q; //I will burn in developer hell for this...
 				document.getElementById('acard').style.display = 'none';
 				document.getElementById('abut').style.display = 'none';
 				qcard.style.display = 'block';
@@ -83,7 +88,7 @@
 			function showA() {
 				cvk.killChildren('acard');
 				var acard = document.getElementById('acard');
-				acard.innerHTML = cards[score.currentCard].a; //I will burn in developer hell for this...
+				acard.innerHTML = "<h4>Answer</h4>"+cards[score.currentCard].a; //I will burn in developer hell for this...
 				document.getElementById('qcard').style.display = 'none';
 				document.getElementById('qbut').style.display = 'none';
 				acard.style.display = 'block';
@@ -105,6 +110,7 @@
 			function runTest() {
 				document.getElementById('sbut').style.display = 'none';
 				document.getElementById('scard').style.display = 'none';
+				document.getElementById('sidebar').style.display = 'none';
 				window.setTimeout('endTest()', 60000) //Change to 60000 for 1 min
 				showQ();
 			}
@@ -126,17 +132,6 @@
 		</script>
 	{% endblock %}
 	{% block main %}
-		<div id="thecard">
-			<div id="scard">
-				{{ set.content|safe }}
-			</div>
-			<div id="qcard" style="display:none;">
-				
-			</div>
-			<div id="acard" style="display:none;">
-				
-			</div>
-		</div>
 		<div id="buttonarea">
 			<div id="sbut">
 				<input type="button" value="Start!" onclick="runTest();" id="startbut">
@@ -150,6 +145,18 @@
 				<input type="button" value="Yes" onclick="nextCard(true);">
 				&nbsp;&nbsp;
 				<input type="button" value="No" onclick="nextCard(false);">
+			</div>
+			<br>
+		</div>
+		<div id="thecard">
+			<div id="scard">
+				{{ set.content|safe }}
+			</div>
+			<div id="qcard" style="display:none;">
+				
+			</div>
+			<div id="acard" style="display:none;">
+				
 			</div>
 		</div>
 		<form name="results" action="/send_results/" method="post">
