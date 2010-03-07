@@ -47,7 +47,16 @@
 		<div id="container">
 			<img src="/static/welcome.gif"><br>
 			{% if user.is_authenticated %}
-				<div style="text-align:right;">Hi, {{ user.username }}. <a href="/logout">Log Out</a></div>
+				<div style="text-align:center;">
+					Hi {{ user.username }}
+					&nbsp;|&nbsp;
+					<a href="/main" id="take_test">Take Test</a>
+					&nbsp;|&nbsp;
+					<a href="/show_card" id="view_test">View Tests</a>
+					&nbsp;|&nbsp;
+					<a href="/logout">Log Out</a>
+				</div>
+				<br>
 			{% endif %}
 			{% block main %}
 			{% endblock %}

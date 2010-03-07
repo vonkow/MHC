@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+	{% block title %}
+		{{ set.name  }} Set | Precision Teaching Center
+	{% endblock %}
+	{% block headstuff %}
+	{% endblock %}
+	{% block main %}
+	<h3>{{ set.name }} Set</h3>
+	<div id="o_card">
+		{{ set.content|safe }}
+	</div>
+	<h4 style="margin:0.1em 0.1em">Cards</h4>
+	<ul style="padding:0;margin:0.1em 0.1em;">
+		<li style="list-style:none;display:inline;">
+			<a href="/show_card/{{ set.id }}" style="padding:0.25em 0.5em 0.25em 0.75em;color:#880088;">
+				Intro
+			</a>
+		</li>
+		{% for Card in set.card_set.all %}
+		<li style="list-style:none;display:inline;">
+			<a href="/show_card/{{ set.id }}/{{ Card.order }}" style="padding:0.25em 0.5em 0.25em 0.75em;">
+				{{ Card.order }}
+			</a>
+		</li>
+		{% endfor %}
+	</ul>
+	<br>
+	<h4 style="margin:0.1em 0.1em">Sets</h4>
+	<ul style="padding:0;margin:0.1em 0.1em">
+		{% for Set in all_sets %}
+			<li style="list-style:none;display:inline;">
+				{% ifequal Set.id set.id %}
+					<a href="/show_card/{{ Set.id }}" style="padding:0.25em 0.5em 0.25em 0.75em;color:#880088;">
+						{{ Set.name }}
+					</a>
+				{% else %}
+					<a href="/show_card/{{ Set.id }}" style="padding:0.25em 0.5em 0.25em 0.75em">
+						{{ Set.name }}
+					</a>
+				{% endifequal %}
+			</li>
+		{% endfor %}
+	</ul>
+	<script type="text/javascript">
+		document.getElementById('view_test').style.color="#880088";
+	</script>
+	{% endblock %}

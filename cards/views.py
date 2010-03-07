@@ -86,6 +86,23 @@ def showLogin(request):
 	else:
 		return render_to_response('login.html',)
 
+def showSetView(request, setId):
+	if request.user.is_authenticated():
+		set_list = cardSet.objects.all()
+		Set = get_object_or_404(cardSet, pk=setId)
+		return render_to_response('set_single.html', {'all_sets':set_list, 'set':Set}, context_instance=RequestContext(request))
+	else:
+		return HttpResponseRedirect('/')
+
+def showCardView(request, setId, cardId):
+	if request.user.is_authenticated():
+		set_list = cardSet.objects.all()
+		Set = get_object_or_404(cardSet, pk=setId)
+		Card = get_object_or_404(card, cardSet=Set, order=cardId)
+		return render_to_response('card_single.html', {'all_sets':set_list, 'card':Card}, context_instance=RequestContext(request))
+	else:
+		return HttpResponseRedirect('/')
+
 def selectSet(request, setNum):
 	if request.user.is_authenticated():
 		profile = get_or_create_profile(request.user)
@@ -122,7 +139,7 @@ def processSet(request):
 		usersetscore.save()
 		calcResults(request)
 		usersetscores = userset.usersetscore_set.all().order_by('attempt')
-		return render_to_response('graph.html', {'scores': usersetscores, 'set_list': set_list})
+		return render_to_response('graph.html', {'scores': usersetscores, 'set_list': set_list}, context_instance=RequestContext(request))
 	else:
 		#Return user to login/register page
 		return HttpResponseRedirect('/')

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+	{% block title %}
+		{{ card.cardSet.name }} Set: Card {{ card.order }} | Precision Teaching Center
+	{% endblock %}
+	{% block headstuff %}
+	<script type="text/javascript">
+		var question=true;
+		function switchCard(){
+			if (question) {
+				question=false;
+				document.getElementById('q_card').style.display="none";
+				document.getElementById('a_card').style.display="block";
+				document.getElementById('tog_but').value="Show Question";
+			} else {
+				question=true;
+				document.getElementById('q_card').style.display="block";
+				document.getElementById('a_card').style.display="none";
+				document.getElementById('tog_but').value="Show Answer";
+			}
+		}
+	</script>
+	{% endblock %}
+	{% block main %}
+	<br>
+	<input id="tog_but" type="button" value="Show Answer" onclick="switchCard();">
+	<h3>{{ card.cardSet.name }} Set: Card {{ card.order }}</h3> 
+	<div id="q_card">
+		{{ card.question|safe }}
+	</div>
+	<div id="a_card" style="display:none;">
+		{{ card.answer|safe }}
+	</div>
+	<br>
+	<h4 style="margin:0.1em 0.1em">Cards</h4>
+	<ul style="padding:0;margin:0.1em 0.1em;">
+		<li style="list-style:none;display:inline;">
+			<a href="/show_card/{{ card.cardSet.id }}" style="padding:0.25em 0.5em 0.25em 0.75em">
+				Intro
+			</a>
+		</li>
+		{% for Card in card.cardSet.card_set.all %}
+		<li style="list-style:none;display:inline;">
+			{% ifequal Card.order card.order %}
+				<a href="/show_card/{{ card.cardSet.id }}/{{ Card.order }}" style="padding:0.25em 0.5em 0.25em 0.75em;color:#880088;">
+					{{ Card.order }}
+				</a>
+			{% else %}
+				<a href="/show_card/{{ card.cardSet.id }}/{{ Card.order }}" style="padding:0.25em 0.5em 0.25em 0.75em">
+					{{ Card.order }}
+				</a>
+			{% endifequal %}
+		</li>
+		{% endfor %}
+	</ul>
+	<br>
+	<h4 style="margin:0.1em 0.1em">Sets</h4>
+	<ul style="padding:0;margin:0.1em 0.1em">
+		{% for set in all_sets %}
+			<li style="list-style:none;display:inline;">
+				{% ifequal card.cardSet.id set.id %}
+					<a href="/show_card/{{ set.id }}" style="padding:0.25em 0.5em 0.25em 0.75em;color:#880088;">
+						{{ set.name }}
+					</a>
+				{% else %}
+					<a href="/show_card/{{ set.id }}" style="padding:0.25em 0.5em 0.25em 0.75em">
+						{{ set.name }}
+					</a>
+				{% endifequal %}
+			</li>
+		{% endfor %}
+	</ul>
+	<script type="text/javascript">
+		document.getElementById('view_test').style.color="#880088";
+	</script>
+{% endblock %}

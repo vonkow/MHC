@@ -9,4 +9,6 @@ urlpatterns = patterns('mhc.cards.views',
 	(r'^main/$', 'showSet'),
 	(r'^send_results/$', 'processSet'),
 	(r'^select_set/(?P<setNum>\d+)/$', 'selectSet'),
+	(r'^show_card/(?P<setId>\d+)/$', 'showSetView'),
+	(r'^show_card/(?P<setId>\d+)/(?P<cardId>\d+)/$', 'showCardView'),
 )
