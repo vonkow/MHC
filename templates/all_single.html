@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+	{% block title %}
+		All Sets | Precision Teaching Center
+	{% endblock %}
+	{% block headstuff %}
+	{% endblock %}
+	{% block main %}
+	<h3 style="margin:0.1em 0.1em">Select Test</h3>
+	<ul style="padding:0;margin:0.1em 0.1em">
+		{% for Set in all_sets %}
+			<li style="list-style:none;display:inline;">
+				<a href="/show_card/{{ Set.id }}" style="padding:0.25em 0.5em 0.25em 0.75em">
+					{{ Set.name }}
+				</a>
+			</li>
+		{% endfor %}
+	</ul>
+	<script type="text/javascript">
+		document.getElementById('view_test').style.color="#880088";
+	</script>
+	{% endblock %}

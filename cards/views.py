@@ -86,6 +86,13 @@ def showLogin(request):
 	else:
 		return render_to_response('login.html',)
 
+def showAllView(request):
+	if request.user.is_authenticated():
+		set_list = cardSet.objects.all()
+		return render_to_response('all_single.html', {'all_sets':set_list}, context_instance=RequestContext(request))
+	else:
+		return HttpResponseRedirect('/')
+
 def showSetView(request, setId):
 	if request.user.is_authenticated():
 		set_list = cardSet.objects.all()

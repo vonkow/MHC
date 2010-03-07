@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 	{% block title %}
-		{{ card.cardSet.name }} Set: Card {{ card.order }} | Precision Teaching Center
+		{{ card.cardSet.name }} Test: Card {{ card.order }} | Precision Teaching Center
 	{% endblock %}
 	{% block headstuff %}
 	<script type="text/javascript">
@@ -23,7 +23,7 @@
 	{% block main %}
 	<br>
 	<input id="tog_but" type="button" value="Show Answer" onclick="switchCard();">
-	<h3>{{ card.cardSet.name }} Set: Card {{ card.order }}</h3> 
+	<h3>{{ card.cardSet.name }} Test: Card {{ card.order }}</h3> 
 	<div id="q_card">
 		{{ card.question|safe }}
 	</div>
@@ -53,7 +53,7 @@
 		{% endfor %}
 	</ul>
 	<br>
-	<h4 style="margin:0.1em 0.1em">Sets</h4>
+	<h4 style="margin:0.1em 0.1em">Tests</h4>
 	<ul style="padding:0;margin:0.1em 0.1em">
 		{% for set in all_sets %}
 			<li style="list-style:none;display:inline;">
