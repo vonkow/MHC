@@ -58,7 +58,10 @@ def newUser(request):
 			user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
 			profile = get_or_create_profile(user)
 			if request.POST['sex']:
-				profile.sex = request.POST['sex']
+				if request.POST['sex']=='male':
+					profile.sex = 'm'
+				else:
+					profile.sex = 'f'
 			if request.POST['birth_city']:
 				profile.birth_city = request.POST['birth_city']
 			if request.POST['birth_country']:
