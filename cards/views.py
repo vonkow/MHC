@@ -56,7 +56,54 @@ def newUser(request):
 			user.save()
 			#Create Profile
 			user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
-			user.userprofile = get_or_create_profile(user)
+			profile = get_or_create_profile(user)
+			if request.POST['sex']:
+				profile.sex = request.POST['sex']
+			if request.POST['birth_city']:
+				profile.birth_city = request.POST['birth_city']
+			if request.POST['birth_country']:
+				profile.birth_country = request.POST['birth_country']
+			if request.POST['city']:
+				profile.city = request.POST['city']
+			if request.POST['country']:
+				profile.country = request.POST['country']
+			if request.POST['zip']:
+				profile.zip = int(request.POST['zip'])
+			if request.POST['religion']:
+				profile.religion = request.POST['religion']
+			if request.POST['marital_status']:
+				profile.marital_status = request.POST['marital_status']
+			if request.POST['marriages']:
+				profile.marriages = int(request.POST['marriages'])
+			if request.POST['children']:
+				profile.children = int(request.POST['children'])
+			if request.POST['grandchildren']:
+				profile.grandchildren = int(request.POST['grandchildren'])
+			if request.POST['brothers']:
+				profile.brothers = int(request.POST['brothers'])
+			if request.POST['sisters']:
+				profile.sisters = int(request.POST['sisters'])
+			if request.POST['birth_order']:
+				profile.birth_order = int(request.POST['birth_order'])
+			if request.POST['education']:
+				profile.education = request.POST['education']
+			if request.POST['occupation']:
+				profile.occupation = request.POST['occupation']
+			if request.POST['former_occupation']:
+				profile.former_occupation = request.POST['former_occupation']
+			if request.POST['spouse_education']:
+				profile.spouse_education = request.POST['spouse_education']
+			if request.POST['spouse_occupation']:
+				profile.spouse_occupation = request.POST['spouse_occupation']
+			if request.POST['mother_education']:
+				profile.mother_education = request.POST['mother_education']
+			if request.POST['mother_occupation']:
+				profile.mother_occupation = request.POST['mother_occupation']
+			if request.POST['father_education']:
+				profile.father_education = request.POST['father_education']
+			if request.POST['father_occupation']:
+				profile.father_occupation = request.POST['father_occupation']
+			profile.save()
 			if user is not None and user.is_active:
 				auth.login(request, user)
 		else:
